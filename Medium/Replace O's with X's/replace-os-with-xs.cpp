@@ -7,106 +7,70 @@ using namespace std;
 // } Driver Code Ends
 // User function Template for C++
 
-// class Solution{
-// public:
-//     bool isReplacable(int i,int j,int& n,int& m,vector<vector<char>>& mat)
-//     {
-//         int px=i,py=j;
-//         while(i>=0)
-//         {
-//             if(mat[i][j]=='X') break;
-//             i--;
-//             if(i==-1) return true;
-//         }
-//         i=px;
-//         while(j>=0)
-//         {
-//             if(mat[i][j]=='X') break;
-//             j--;
-//             if(j==-1) return true;
-//         }
-//         j=py;
-//         while(i<n)
-//         {
-//             if(mat[i][j]=='X') break;
-//             i++;
-//             if(i==n) return true;
-//         }
-//          i=px;
-//         while(j<m)
-//         {
-//             if(mat[i][j]=='X') break;
-//             j++;
-//             if(j==m) return true;
-//         }
-//         return false;
-//     }
-//     void solve(int i,int& n,int& m,vector<vector<char>>& mat)
-//     {
-//         if(i==n) return;
+class Solution{
+private:
+     void dfs(int row, int col, vector<vector<int>> &vis, 
+    vector<vector<char>> &mat, int delrow[], int delcol[]) {
+        vis[row][col] = 1; 
+        int n = mat.size();
+        int m = mat[0].size();
         
-//         for(int j=0;j<m;j++)
-//         {
-//             if(mat[i][j]=='O' && isReplacable(i,j,n,m,mat))
-//             {
-//                 mat[i][j]='X';
-//             }
-//         }
-//         solve(i+1,n,m,mat);
-//     }
-//     vector<vector<char>> fill(int n, int m, vector<vector<char>> mat)
-//     {
-//         // code here
-//         solve(0,n,m,mat);
-//         return mat;
-//     }
-// };
-
-class Solution {
+        // check for top, right, bottom, left 
+        for(int i = 0;i<4;i++) {
+            int nrow = row + delrow[i];
+            int ncol = col + delcol[i]; 
+            // check for valid coordinates and unvisited Os
+            if(nrow >=0 && nrow <n && ncol >= 0 && ncol < m 
+            && !vis[nrow][ncol] && mat[nrow][ncol] == 'O') {
+                dfs(nrow, ncol, vis, mat, delrow, delcol); 
+            }
+        }
+    }
 public:
-    int dx[4] = {-1, 1, 0, 0};
-    int dy[4] = {0, 0, -1, 1};
-
-    bool isValid(int ii, int jj, int& n, int& m) {
-        return (ii >= 0 && jj >= 0 && ii < n && jj < m); 
-    }
-
-    bool isBoundary(int i, int j, int &n, int &m) {
-        return (i == 0 || j == 0 || i == n - 1 || j == m - 1);
-    }
-
-    void setNotClosed(int i, int j, int& n, int& m, vector<vector<char>>& mat) {
-        mat[i][j] = 'N';
-
-        for (int d = 0; d < 4; ++d) {
-            int ii = dx[d] + i;
-            int jj = dy[d] + j;
-            if (isValid(ii, jj, n, m) && mat[ii][jj] == 'O')
-                setNotClosed(ii, jj, n, m, mat);
-        }
-    }
-
-    vector<vector<char>> fill(int n, int m, vector<vector<char>>& mat) {
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-                if (isBoundary(i, j, n, m) && mat[i][j] == 'O')
-                    setNotClosed(i, j, n, m, mat);
+     vector<vector<char>> fill(int n, int m, 
+    vector<vector<char>> mat)
+    {
+        int delrow[] = {-1, 0, +1, 0};
+        int delcol[] = {0, 1, 0, -1}; 
+        vector<vector<int>> vis(n, vector<int>(m,0)); 
+        // traverse first row and last row 
+        for(int j = 0 ; j<m;j++) {
+            // check for unvisited Os in the boundary rows
+            // first row 
+            if(!vis[0][j] && mat[0][j] == 'O') {
+                dfs(0, j, vis, mat, delrow, delcol); 
+            }
+            
+            // last row 
+            if(!vis[n-1][j] && mat[n-1][j] == 'O') {
+                dfs(n-1,j,vis,mat, delrow, delcol); 
             }
         }
-
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-                if (mat[i][j] == 'O')
-                    mat[i][j] = 'X';
-                else if (mat[i][j] == 'N')
-                    mat[i][j] = 'O';
+        
+        for(int i = 0;i<n;i++) {
+            // check for unvisited Os in the boundary columns
+            // first column 
+            if(!vis[i][0] && mat[i][0] == 'O') {
+                dfs(i, 0, vis, mat, delrow, delcol); 
+            }
+            
+            // last column
+            if(!vis[i][m-1] && mat[i][m-1] == 'O') {
+                dfs(i, m-1, vis, mat, delrow, delcol); 
             }
         }
-
-        return mat;
+        
+        // if unvisited O then convert to X
+        for(int i = 0;i<n;i++) {
+            for(int j= 0 ;j<m;j++) {
+                if(!vis[i][j] && mat[i][j] == 'O') 
+                    mat[i][j] = 'X'; 
+            }
+        }
+        
+        return mat; 
     }
 };
-
 
 //{ Driver Code Starts.
 
