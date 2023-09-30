@@ -25,38 +25,27 @@ class Solution {
     //     }
     //     return false;
     // }
-      
-
-
-bool dfs(int node, vector<int> &vis, vector<int> adj[]){
-        vis[node]=1;
-        
-        for(auto child: adj[node]){
-            if(vis[child]==0){ //child node not visited yet
-                if(dfs(child,vis,adj)){
-                    return true; //returning true if child node return presence of cycle
-                }
-            }
+      bool dfs(int i,vector<int> adj[],vector<int>& vis){
+        vis[i]=1;
             
-            else if(vis[child]==1){ //node is still under processing and appeared again
-                return true; //then there is back edge, finally cycle
+        for(auto x:adj[i]){
+            if(vis[x]==0){
+                if(dfs(x,adj,vis)) return true;
             }
+            else if(vis[x]==1) return true;
         }
-        
-        vis[node]=2; //marks evaluation is complete
+        vis[i]=2;
         return false;
     }
-   public: 
-    
-    bool isCyclic(int v, vector<int> adj[]) {
-        // When graph is directed, our undirected approach fails whose pictorial rep has been attached
+  public:
+    // Function to detect cycle in a directed graph.
+    bool isCyclic(int V, vector<int> adj[]) {
+        // code here
+        vector<int> vis(V,0);
         
-        vector<int> vis(v,0);
-        for(int i=0;i<v;i++){
+        for(int i=0;i<V;i++){
             if(vis[i]==0){
-                if(dfs(i,vis,adj)){
-                    return true;
-                }
+                if(dfs(i,adj,vis)) return true;
             }
         }
         
