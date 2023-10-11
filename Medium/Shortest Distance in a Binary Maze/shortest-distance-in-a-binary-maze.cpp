@@ -39,7 +39,6 @@ class Solution {
                             return dist+1;
                         } 
                         // cout<<nx<<"-"<<src.first<<","<<src.second<<"-"<<ny<<"  ";
-                        
                         vis[nx][ny]=(dist+1);
                         q.push({dist+1,{nx,ny}});
                 }
