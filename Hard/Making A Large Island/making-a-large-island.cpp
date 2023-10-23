@@ -4,156 +4,109 @@ using namespace std;
 
 // } Driver Code Ends
 //User function Template for C++
-// class Solution
-// {
-// public:
-//     map<int,int> mp;
-//     int dx[4]={0,0,-1,1};
-//     int dy[4]={-1,1,0,0};
-//     void dfs(int x,int y,int clr,int count,vector<vector<int>>& grid){
-//         grid[x][y]=clr;
-//         mp[clr]=count;
+class DisjointSet {
 
-//         for(int i=0;i<4;i++){
-//                 int nx=x+dx[i];
-//                 int ny=y+dy[i];
-//                 if( nx>=0 && nx<grid.size() && ny>=0 && ny<grid[0].size() &&
-//                     grid[nx][ny]==1 ){
-//                         count++;
-//                         dfs(nx,ny,clr,count,grid);
-//                     }
-//         }
-//     }
-//     int largestIsland(vector<vector<int>>& grid) {
-//         mp.clear();
-//         if(grid.size() == 0){
-//             return 0 ;
-//         }
-//         int clr=2;
-//         int n=grid.size(),m=grid[0].size();
-//         for(int i=0;i<n;i++){
-//             for(int j=0;j<m;j++){
-//                 if(grid[i][j]==1){
-//                     dfs(i,j,clr,1,grid);
-//                     clr++;
-//                 }
-//             }
-//         }
-//         int maxi=0;
-//         for(int i=0;i<n;i++){
-//             for(int j=0;j<m;j++){
-//                 if(grid[i][j]==0){
-//                     int count=1;
-//                     set<int> st;
-//                     for(int k=0;k<4;k++){
-//                         int nx=i+dx[k];
-//                         int ny=j+dy[k];
-//                         if( nx>=0 && nx<grid.size() && ny>=0 && ny<grid[0].size() &&
-//                             grid[nx][ny]!=0 && st.count(grid[nx][ny])==0){
-//                                 int adjClr=grid[nx][ny];
-//                                 count+=mp[adjClr];
-//                                 st.insert(adjClr);
-//                             }
-//                     }
-//                     maxi=max(maxi,count);   
-//                 }
-//             }
-//         }
-//         return maxi;
-//     }
-// };
-
-class Solution
-{
 public:
-    int n, m;
-    
-    // To traverse four directions of grid
-    int di[4] = {-1, 0, 1, 0};
-    int dj[4] = {0, -1, 0, 1};
-    
-    // To check whether coordinate lies inside the grid
-    bool isValid(int ni, int nj)
-    {
-        if(ni >= 0 && nj >= 0 && ni < n && nj < m)
-            return true;
-        return false;
-    }
-    
-    // To calculate size of each island in the grid.
-    // For every island we are using a key. We are filling the visited array with this key,
-    // so that we can get the size of island easily afterwards.
-    int dfs(int i, int j, vector<vector<int>>&grid, vector<vector<int>>&vis, int &key)
-    {
-        vis[i][j] = key;
-        int sz = 1;
-        for(int k = 0; k < 4; k++)
-        {
-            int ni = i + di[k];
-            int nj = j + dj[k];
-            
-            if(isValid(ni, nj) && !vis[ni][nj] && grid[ni][nj])
-            {
-                sz += dfs(ni, nj, grid, vis, key);
-            }
+    vector<int> rank, parent, size;
+    DisjointSet(int n) {
+        rank.resize(n + 1, 0);
+        parent.resize(n + 1);
+        size.resize(n + 1);
+        for (int i = 0; i <= n; i++) {
+            parent[i] = i;
+            size[i] = 1;
         }
-        
-        return sz;
     }
-    // main function
-    int largestIsland(vector<vector<int>>& grid) 
-    {
-        // Your code goes here.
-        n = grid.size();
-        m = grid[0].size();
-        int mx = 0, key = 1;
-        vector<vector<int>> vis(n+1, vector<int>(m+1, 0));
-        map<int, int> mp;
-        // Map stores key - size relation in it
-        for(int i = 0; i < n; i++)
-        {
-            for(int j = 0; j < m; j++)
-            {
-                if(!vis[i][j] && grid[i][j])
-                {
-                    key++;
-                    int sz = dfs(i, j, grid, vis, key);
-                    mp[key] = sz;
-                    mx = max(mx, sz);
+
+    int findUPar(int node) {
+        if (node == parent[node])
+            return node;
+        return parent[node] = findUPar(parent[node]);
+    }
+
+    void unionByRank(int u, int v) {
+        int ulp_u = findUPar(u);
+        int ulp_v = findUPar(v);
+        if (ulp_u == ulp_v) return;
+        if (rank[ulp_u] < rank[ulp_v]) {
+            parent[ulp_u] = ulp_v;
+        }
+        else if (rank[ulp_v] < rank[ulp_u]) {
+            parent[ulp_v] = ulp_u;
+        }
+        else {
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void unionBySize(int u, int v) {
+        int ulp_u = findUPar(u);
+        int ulp_v = findUPar(v);
+        if (ulp_u == ulp_v) return;
+        if (size[ulp_u] < size[ulp_v]) {
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else {
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+class Solution {
+private:
+    bool isValid(int newr, int newc, int n) {
+        return newr >= 0 && newr < n && newc >= 0 && newc < n;
+    }
+public:
+    int largestIsland(vector<vector<int>>& grid) {
+        int n = grid.size();
+        DisjointSet ds(n * n);
+        // step - 1
+        for (int row = 0; row < n ; row++) {
+            for (int col = 0; col < n ; col++) {
+                if (grid[row][col] == 0) continue;
+                int dr[] = { -1, 0, 1, 0};
+                int dc[] = {0, -1, 0, 1};
+                for (int ind = 0; ind < 4; ind++) {
+                    int newr = row + dr[ind];
+                    int newc = col + dc[ind];
+                    if (isValid(newr, newc, n) && grid[newr][newc] == 1) {
+                        int nodeNo = row * n + col;
+                        int adjNodeNo = newr * n + newc;
+                        ds.unionBySize(nodeNo, adjNodeNo);
+                    }
                 }
             }
         }
-        
-        // now traverse grid and if you find any zero change it to one and
-        // then observe what will be its impact on existing size of island.
-        for(int i = 0 ; i < n; i++)
-        {
-            for(int j = 0; j < m; j++)
-            {
-                if(grid[i][j] == 0)
-                {
-                    int newSize = 1;
-                    set<int> st;
-                    for(int k = 0; k < 4; k++)
-                    {
-                        int ni = i + di[k];
-                        int nj = j + dj[k];
-                        
-                        if(isValid(ni, nj) && grid[ni][nj])
-                        {
-                            st.insert(vis[ni][nj]);
+        // step 2
+        int mx = 0;
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] == 1) continue;
+                int dr[] = { -1, 0, 1, 0};
+                int dc[] = {0, -1, 0, 1};
+                set<int> components;
+                for (int ind = 0; ind < 4; ind++) {
+                    int newr = row + dr[ind];
+                    int newc = col + dc[ind];
+                    if (isValid(newr, newc, n)) {
+                        if (grid[newr][newc] == 1) {
+                            components.insert(ds.findUPar(newr * n + newc));
                         }
                     }
-                    for(auto it : st)
-                    {
-                        newSize += mp[it];
-                    }
-                    mx = max(mx, newSize);
                 }
+                int sizeTotal = 0;
+                for (auto it : components) {
+                    sizeTotal += ds.size[it];
+                }
+                mx = max(mx, sizeTotal + 1);
             }
         }
-        
-        // return maximum size island.
+        for (int cellNo = 0; cellNo < n * n; cellNo++) {
+            mx = max(mx, ds.size[ds.findUPar(cellNo)]);
+        }
         return mx;
     }
 };
