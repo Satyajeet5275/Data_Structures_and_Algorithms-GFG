@@ -13,8 +13,6 @@ public:
         {
             if(ind>=n)
             {
-                // if(rem%wt[ind]==0) return rem/wt[ind]*(arr[ind]);
-                // else return -1e9;
                 return 0;
             }
             if(dp[ind][rem]!=-1) return dp[ind][rem];
@@ -31,7 +29,6 @@ public:
         // code here
         vector<vector<int>> dp(N,vector<int>(amount+1,-1));
         int ans=solve(0,amount,coins,dp,N,wt);
-        if(ans==-1e9) return 0;
         return ans;
         
     }
