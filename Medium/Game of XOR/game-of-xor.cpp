@@ -3,23 +3,20 @@
 using namespace std;
 
 // } Driver Code Ends
+
 class Solution {
   public:
-    int gameOfXor(int N , int A[]) {
-      int xor1=0;
-      int preval=0;
-      for(int i=0;i<N;i++)
+    int gameOfXor(int n , int arr[]) {
+        // code here
+      int val = 0;
+      for(int i = 0 ; i<n;i++)
       {
-          int val=preval+(N-i);
-          if(val%2!=0)
-          {
-              xor1=xor1^A[i];
-          }
-          preval+=(N-i-1)-i;
-          
+          int tt = (i+1)*(n-i);  // this means that how many times a particular val is comming in subaarays
+          if(tt&1) // if occurance is odd then do it
+              val = val^arr[i];
       }
-      return xor1;
-       
+      return val;
+     
     }
 };
 
