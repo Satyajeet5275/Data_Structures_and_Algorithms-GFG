@@ -8,10 +8,11 @@ using namespace std;
 class Solution
 {
   public:
-    vector<int> findOrder(int N, int m, vector<vector<int>> edge) 
+    vector<int> findOrder(int n, int m, vector<vector<int>> edge) 
     {
-        vector<vector<int>> adj(N);
-	    vector<int> indegree(N,0);
+        //code here
+        vector<vector<int>> adj(n);
+	    vector<int> indegree(n,0);
 	    for(auto x:edge){
 	        int v=x[0];
 	        int u=x[1];
@@ -19,7 +20,7 @@ class Solution
 	        adj[u].push_back(v);
 	    }
 	    queue<int> q;
-	    for(int i=0;i<N;i++){
+	    for(int i=0;i<n;i++){
 	        if(indegree[i]==0){
 	            q.push(i);
 	        }
@@ -36,7 +37,7 @@ class Solution
 	            }
 	        }
 	    }
-	    if(ans.size()==N) return ans;
+	    if(ans.size()==n) return ans;
 	    return {};
     }
 };
