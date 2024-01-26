@@ -45,13 +45,14 @@ class Solution
 };
 
 
+
 //{ Driver Code Starts.
 int main()
 {
 	int t;
 	//taking testcases
 	cin>>t;
-	cout<<setprecision(2)<<fixed;
+	cout<<setprecision(6)<<fixed;
 	while(t--){
 	    //size of array and weight
 		int n, W;
